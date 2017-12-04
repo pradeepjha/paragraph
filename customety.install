@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * Implements hook_enable().
+ *
+ * Create a field. Fields can be created without any needs to attach them to
+ * entities.
+ */
+
+
+ function customety_enable() {
+   $entity_info = entity_get_info('paragraphs_item');
+   foreach($entity_info['bundles'] as $bundle_system_name => $bundle) {
+     $entity_bundles[$bundle_system_name] = $bundle['label'];
+   }
+    //kpr($entity_bundles);
+    $field = array(
+      'field_name' => 'custom_role_field',
+      'type' => 'list_text',
+      'settings' => array(
+            'allowed_values' => user_roles(),
+       ),
+    );
+    field_create_field($field);
+
+    foreach ($entity_bundles as $key => $value) {
+    /**
+       * Bind field to a entity bundle.
+       */
+      $instance = array(
+        'field_name' => $field['field_name'],
+        'label' => 'Role',
+        'entity_type' => 'paragraphs_item',
+        'bundle' => $key,
+        'widget' => array(
+            'type' => 'options_select',
+          ),
+      );
+      field_create_instance($instance);
+
+    }
+  // kpr($entity_bundles);
+
+
+ }
+ //
+ /**
+  * Implements hook_disable().
+  *
+  * Remove field from node bundle (content type) and then delete the field.
+  */
+ function customety_disable() {
+   $entity_info = entity_get_info('paragraphs_item');
+   foreach($entity_info['bundles'] as $bundle_system_name => $bundle) {
+     $entity_bundles[$bundle_system_name] = $bundle['label'];
+   }
+   foreach ($entity_bundles as $key => $value) {
+     $instance = array(
+       'field_name' => 'custom_role_field',
+       'entity_type' => 'paragraphs_item',
+         'bundle' => $key,
+     );
+     field_delete_instance($instance);
+     field_delete_field($instance['field_name']);
+     print 'Removed ' . $instance['field_name'] . "\n";
+   }
+ }
+
+/**
+ * Update hook to add a field to a node.
+ */
+// function customety_update_7000() {
+//   $field_name = 'field_rolelist';
+//   // Make sure the field doesn't already exist.
+//   if (!field_info_field($field_name)) {
+//     // Create the field.
+//     $field = array(
+//       'field_name' => $field_name,
+//       'type' => 'text',
+//       'settings' => array('max_length' => 64),
+//     );
+//     field_create_field($field);
+//
+//     // Create the instance.
+//     $instance = array( 'field_name' => $field_name,
+//       'entity_type' => 'paragraphs',
+//       'bundle' => 'articlepg',
+//       'label' => 'Alias',
+//       'description' => 'The article paragraph ref.',
+//       'required' => TRUE,
+//     );
+//     field_create_instance($instance);
+//
+//     watchdog('customety', t('!field_name was added successfully.', array('!field_name' => $field_name)));
+//   }
+//   else {
+//     watchdog('customety', t('!field_name already exists.', array('!field_name' => $field_name)));
+//   }
+// }
+?>

@@ -1,0 +1,3 @@
+name = Custom Role field
+core = 7.x
+dependencies[] = field
